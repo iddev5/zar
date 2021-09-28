@@ -147,24 +147,16 @@ pub fn finalize(self: *Archive, allocator: *Allocator) !void {
         // Generate the complete string table
         for (self.files.items) |file, index| {
             var header = &self.headers.items[index];
-            const is_the_name_allowed = (file.name.len < 16);
 
-            // If the file is small enough to fit in header, then just write it there
-            // Otherwise, add it to string table and add a reference to its location
-            const name = if (is_the_name_allowed) try mem.concat(allocator, u8, &.{ file.name, "/" }) else try std.fmt.allocPrint(allocator, "/{}", .{blk: {
-                // Get the position of the file in string table
-                const pos = string_table.items.len;
+            // Get the position of the file in string table
+            const pos = string_table.items.len;
 
-                // Now add the file name to string table
-                try string_table.appendSlice(file.name);
-                try string_table.appendSlice("/\n");
-
-                break :blk pos;
-            }});
-            defer allocator.free(name);
+            // Now add the file name to string table
+            try string_table.appendSlice(file.name);
+            try string_table.appendSlice("/\n");
 
             // Edit the header
-            _ = try std.fmt.bufPrint(&header.ar_name, "{s: <16}", .{name});
+            _ = try std.fmt.bufPrint(&header.ar_name, "/{: <15}", .{pos});
         }
 
         // Write the string table itself
