@@ -183,7 +183,7 @@ pub fn finalize(self: *Archive, allocator: *Allocator) !void {
         _ = try std.fmt.bufPrint(
             &headerBuffer,
             "{s: <16}{: <12}{: <6}{: <6}{o: <8}{: <10}`\n",
-            .{ &header_names[index], 0, 0, 0, file.contents.mode, file.contents.length },
+            .{ &header_names[index], 0, 0, 0, file.contents.mode - std.os.S.IFREG, file.contents.length },
         );
 
         // TODO: handle errors
